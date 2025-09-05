@@ -172,7 +172,7 @@ class SpeechStream(stt.SpeechStream):
                     # AWS times out after 15s of inactivity, this tends to happen
                     # at the end of the session, when the input is gone, we'll ignore it and
                     # just treat it as a silent retry
-                    logger.info("restarting transcribe session")
+                    logger.info("restarting transcribe session", exc_info=e)
                     continue
                 else:
                     raise e
