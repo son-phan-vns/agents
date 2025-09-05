@@ -138,10 +138,15 @@ class _ParticipantAudioOutput(io.AudioOutput):
 
         async def _wait_buffered_audio() -> None:
             while not self._audio_buf.empty():
+                print("Buffer not empty, draining...")
                 if not self._playback_enabled.is_set():
+                    print("Waiting for playback enabled...")
                     await self._playback_enabled.wait()
 
+                print("Waiting for playout...")
                 await self._audio_source.wait_for_playout()
+                
+            print("Buffer empty, exiting loop")
 
         wait_for_playout = asyncio.create_task(_wait_buffered_audio())
         await asyncio.wait(

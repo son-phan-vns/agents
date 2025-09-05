@@ -166,6 +166,8 @@ class Chan(Generic[T]):
             return self.qsize() >= self._maxsize
 
     def empty(self) -> bool:
+        print(f"_queue type: {type(self._queue)}")
+        print(f"Queue empty? {not self._queue}, size={len(self._queue)}")
         return not self._queue
 
     def __aiter__(self) -> AsyncIterator[T]:
