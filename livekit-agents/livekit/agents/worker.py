@@ -228,6 +228,9 @@ class WorkerOptions:
     """
     prometheus_port: NotGivenOr[int] = NOT_GIVEN
     """When enabled, will expose prometheus metrics on :{prometheus_port}/metrics"""
+    
+    ping_timeout: int = 60
+    """Maximum amount of time to wait for a process to respond to a ping"""
 
     def validate_config(self, devmode: bool) -> None:
         load_threshold = _WorkerEnvOption.getvalue(self.load_threshold, devmode)
@@ -315,7 +318,7 @@ class Worker(utils.EventEmitter[EventTypes]):
                 memory_warn_mb=2000,
                 memory_limit_mb=0,  # no limit
                 ping_interval=5,
-                ping_timeout=60,
+                ping_timeout=opts.ping_timeout,
                 high_ping_threshold=2.5,
                 mp_ctx=self._mp_ctx,
                 loop=self._loop,
@@ -335,6 +338,7 @@ class Worker(utils.EventEmitter[EventTypes]):
             memory_warn_mb=opts.job_memory_warn_mb,
             memory_limit_mb=opts.job_memory_limit_mb,
             http_proxy=opts.http_proxy or None,
+            ping_timeout=opts.ping_timeout,
         )
 
         self._previous_status = agent.WorkerStatus.WS_AVAILABLE

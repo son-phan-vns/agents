@@ -41,6 +41,7 @@ class ProcPool(utils.EventEmitter[EventTypes]):
         memory_limit_mb: float,
         http_proxy: str | None,
         loop: asyncio.AbstractEventLoop,
+        ping_timeout: int = 60,
     ) -> None:
         super().__init__()
         self._job_executor_type = job_executor_type
@@ -51,6 +52,7 @@ class ProcPool(utils.EventEmitter[EventTypes]):
         self._inf_executor = inference_executor
         self._initialize_timeout = initialize_timeout
         self._loop = loop
+        self._ping_timeout = ping_timeout
         self._memory_limit_mb = memory_limit_mb
         self._memory_warn_mb = memory_warn_mb
         self._default_num_idle_processes = num_idle_processes
@@ -145,7 +147,7 @@ class ProcPool(utils.EventEmitter[EventTypes]):
                 mp_ctx=self._mp_ctx,
                 loop=self._loop,
                 ping_interval=2.5,
-                ping_timeout=60,
+                ping_timeout=self._ping_timeout,
                 high_ping_threshold=0.5,
                 memory_warn_mb=self._memory_warn_mb,
                 memory_limit_mb=self._memory_limit_mb,
