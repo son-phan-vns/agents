@@ -249,7 +249,7 @@ class SupervisedProc(ABC):
         if sys.platform == "win32":
             self._proc.terminate()
         else:
-            self._proc.kill()
+            self._proc.terminate()
 
         self._kill_sent = True
 
