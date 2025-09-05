@@ -124,29 +124,34 @@ class _ParticipantAudioOutput(io.AudioOutput):
             return
         self._interrupted_event.set()
 
+    @utils.log_exceptions(logger=logger)
     def pause(self) -> None:
         super().pause()
+        logger.info("Pausing playback")
         self._playback_enabled.clear()
         # self._audio_source.clear_queue()
 
     def resume(self) -> None:
         super().resume()
+        logger.info("Resuming playback")
         self._playback_enabled.set()
 
+    @utils.log_exceptions(logger=logger)
     async def _wait_for_playout(self) -> None:
         wait_for_interruption = asyncio.create_task(self._interrupted_event.wait())
 
         async def _wait_buffered_audio() -> None:
             while not self._audio_buf.empty():
-                print("Buffer not empty, draining...")
+                
+                logger.info("Buffer not empty, draining...")
                 if not self._playback_enabled.is_set():
-                    print("Waiting for playback enabled...")
+                    logger.info("Waiting for playback enabled...")
                     await self._playback_enabled.wait()
 
-                print("Waiting for playout...")
+                logger.info("Waiting for playout...")
                 await self._audio_source.wait_for_playout()
                 
-            print("Buffer empty, exiting loop")
+            logger.info("Buffer empty, exiting loop")
 
         wait_for_playout = asyncio.create_task(_wait_buffered_audio())
         await asyncio.wait(
